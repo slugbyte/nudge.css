@@ -1,0 +1,532 @@
+$grayscale: (#fff #eee #ccc #aaa #999 #777 #555 #333 #222 #000)
+
+$white: #fff
+$gray: #ccc
+$black: #000
+$cyan: #8adee2
+$green: #9fdda0
+$yellow: #dbddaa
+$orange: #e5d090
+$red: #c68989
+$pink: #d89cd6
+$blue: #71b9fc
+
+$break-medium: 30rem
+$break-large: 60rem
+
+// six sizes for fonts (1-6) (like h1-h6)
+$font-size: (1rem 1.25rem 1.5rem 1.75rem 2rem 2.25rem)
+
+// ten sizes for padding margin and absolute-position (0-9)
+$space-list: (0 .25rem .5rem .75rem 1rem 1.5rem 2rem 2.75rem 3rem 3.25rem)
+
+// ten sizes for width and height (0-9)
+$size-list: (.5rem 1rem 2rem 4rem 8rem 16rem 24rem 32rem 48rem 64rem)
+
+// reset
+html *
+  margin: 0
+  padding: 0
+  box-sizing: border-box
+  text-decoration: none
+  font-family: 'Roboto Mono', monospace
+  line-height: 1.125
+  font-size: 1rem
+  border: none
+  outline: none
+
+@mixin button-lighten($color)
+  border: none
+  user-select: none
+  &:focus
+    outline: 2px dotted $color
+  &:hover
+    background: lighten($color, 20%)
+  &:active
+    background: lighten($color, 30%)
+
+@mixin button-darken($color)
+  border: none
+  user-select: none
+  &:focus
+    outline: 2px dotted $color
+  &:hover
+    background: darken($color, 15%)
+  &:active
+    background: darken($color, 30%)
+
+@mixin button-color($color)
+  border: none
+  user-select: none
+  &:focus
+    outline: 2px dotted adjust-color($color, $lightness: -20%, $saturation: 15%)
+  &:hover
+    background: adjust-color($color, $lightness: 5%, $saturation: -15%)
+  &:active
+    background: adjust-color($color, $lightness: 10%, $saturation: -25%)
+
+
+@mixin color-darken ($bg, $fg)
+  background: $bg
+  color: $fg
+  &.btn
+    @include button-darken($bg)
+  &.outline-not:focus
+    outline: none
+  *
+    border-color: $fg
+
+@mixin color-lighten ($bg, $fg)
+  background: $bg
+  color: $fg
+  &.btn
+    @include button-lighten($bg)
+  &.outline-not:focus
+    outline: none
+  *
+    border-color: $fg
+
+@mixin create-color ($bg, $fg)
+  background: $bg
+  color: $fg
+  &.btn
+    @include button-color($bg)
+  &.outline-not:focus
+    outline: none
+  *
+    border-color: $fg
+
+// border must be defined before colors to allow for overrides
+.border
+  border: 2px solid black
+
+@for $i from 1 through 5
+  .g#{$i - 1}
+    @include color-darken(nth($grayscale, $i), #000)
+
+@for $i from 6 through 10
+  .g#{$i - 1}
+    @include color-lighten(nth($grayscale, $i), #fff)
+
+.cw,.c0,.white
+  @include color-darken($white, $black)
+
+.cb,.c1,.grey,.gray
+  @include color-darken($gray, $black)
+
+.cb,.c2,.black
+  @include color-lighten($black, $white)
+
+.cc,.c3,.cyan
+  @include create-color($cyan, $black)
+
+.cg,.c4,.green
+  @include create-color($green, $black)
+
+.cy,.c5,.yellow
+  @include create-color($yellow, $black)
+
+.co,.c6,.orange
+  @include create-color($orange, $black)
+
+.cr,.c7,.red
+  @include create-color($red, $black)
+
+.cp,.c8,.pink
+  @include create-color($pink, $black)
+
+.cb,.c9,.blue
+  @include create-color($blue, $black)
+
+// size
+.full
+  width: 100vw
+  height: 100vh
+
+.hide
+  display: none
+
+// float
+.fl
+  float: left
+
+.fr
+  float: right
+
+.fn
+  float: none
+
+.cf
+  display: table
+  clear: both
+
+.cf::before
+  content: " "
+
+// zindex
+@for $i from 0 through 9
+  .z#{$i}
+    z-index: $i
+
+.zmin
+  z-index: -99999
+
+.zmax
+  z-index: 99999
+
+// cursor
+.czoomin:hover,.czoomin:hover
+  cursor: zoom-in
+.czoomout:hover,.czoomout:active
+  cursor: zoom-out
+.cpointer:hover
+  cursor: pointer
+.cgrab:hover
+  cursor: grab
+.cgrab:active
+  cursor: grabbing
+.ccopy:hover,.ccopy:active
+  cursor: copy
+.cprogress:active
+  cursor: progress
+
+@function identity($value)
+  @return $value
+
+@function negative($value)
+  @return -1 * $value
+
+@function get-percent-name($value)
+  @if $value == 110
+    @return 33
+  @if $value == 120
+    @return 66
+  @return  $value
+
+// adding + 0px stops sass from pre computing math
+@function get-percent-value($value)
+  @if $value == 110
+    @return calc((100% + 0px) / 3)
+  @if $value == 120
+    @return calc((100% + 0px) / 1.5)
+  @return unquote("#{$value}%")
+
+@mixin make-class-style($prefix, $name, $target, $value-list, $format)
+  @for $i from 1 through 10
+    .#{$prefix}#{$name}#{$i - 1}
+      #{$target}: call(get-function($format), nth($value-list, $i))
+
+@mixin make-class-style-on-x($prefix, $name, $target, $value-list, $format)
+  @for $i from 1 through 10
+    .#{$prefix}#{$name}#{$i - 1}
+      #{$target}-left: call(get-function($format), nth($value-list, $i))
+      #{$target}-right: call(get-function($format), nth($value-list, $i))
+
+@mixin make-class-style-on-y($prefix, $name, $target, $value-list, $format)
+  @for $i from 1 through 10
+    .#{$prefix}#{$name}#{$i - 1}
+      #{$target}-top: call(get-function($format), nth($value-list, $i))
+      #{$target}-bottom: call(get-function($format), nth($value-list, $i))
+
+@mixin make-target-value($prefix, $name, $target, $value)
+  .#{$prefix}#{$name}
+    #{$target}: $value
+
+// 110 -> 33 (aka 1/3)
+// 120 -> 66 (aka 2/3)
+@mixin make-percent-style($prefix, $name, $target)
+  $i: 0
+  @while $i <= 120
+    $subname: unquote("#{$prefix}#{$name}-" + "#{get-percent-name($i)}")
+    $value: get-percent-value($i)
+    .#{$subname}
+      #{$target}: $value
+    $i: $i + 10
+
+@mixin create-everything($prefix)
+  // position
+  @include make-target-value($prefix, nor, position, static)
+  @include make-target-value($prefix, fix, position, fixed)
+  @include make-target-value($prefix, rel, position, relative)
+  @include make-target-value($prefix, abs, position, absolute)
+  // display
+  @include make-target-value($prefix, db, display, block)
+  @include make-target-value($prefix, dib, display, inline-block)
+  @include make-target-value($prefix, di, display, inline)
+
+  // padding
+  @include make-class-style($prefix, pa, padding, $space-list, identity)
+  @include make-class-style-on-x($prefix, px, padding, $space-list, identity)
+  @include make-class-style-on-y($prefix, py, padding, $space-list, identity)
+  @include make-class-style($prefix, pl, padding-left, $space-list, identity)
+  @include make-class-style($prefix, pr, padding-right, $space-list, identity)
+  @include make-class-style($prefix, pt, padding-top, $space-list, identity)
+  @include make-class-style($prefix, pb, padding-bottom, $space-list, identity)
+  // margin
+  @include make-target-value($prefix, mc, margin, 0 auto)
+  @include make-class-style($prefix, ma, margin, $space-list, identity)
+  @include make-class-style-on-x($prefix, mx, margin, $space-list, identity)
+  @include make-class-style-on-y($prefix, my, margin, $space-list, identity)
+  @include make-class-style($prefix, ml, margin-left, $space-list, identity)
+  @include make-class-style($prefix, mr, margin-right, $space-list, identity)
+  @include make-class-style($prefix, mt, margin-top, $space-list, identity)
+  @include make-class-style($prefix, mb, margin-bottom, $space-list, identity)
+
+  // width
+  @include make-percent-style($prefix, w, width)
+  @include make-class-style($prefix, w, width, $size-list, identity)
+  @include make-class-style($prefix, mw, max-width, $size-list, identity)
+  @include make-target-value($prefix, wa, width, auto)
+  // height
+  @include make-percent-style($prefix, h, height)
+  @include make-class-style($prefix, h, height, $size-list, identity)
+  @include make-class-style($prefix, mh, max-height, $size-list, identity)
+  @include make-target-value($prefix, ha, height, auto)
+
+  // absposition
+  @include make-class-style($prefix, t, top, $space-list, identity)
+  @include make-class-style($prefix, b, bottom, $space-list, identity)
+  @include make-class-style($prefix, l, left, $space-list, identity)
+  @include make-class-style($prefix, r, right, $space-list, identity)
+
+  @include make-class-style($prefix, t-, top, $space-list, negative)
+  @include make-class-style($prefix, b-, bottom, $space-list, negative)
+  @include make-class-style($prefix, l-, left, $space-list, negative)
+  @include make-class-style($prefix, r-, right, $space-list, negative)
+
+  // flex
+  .#{prefix}fauto
+    flex: 1 1 auto
+    min-width: 0
+    min-height: 0
+
+  @include make-target-value($prefix, flex, display, flex)
+  @include make-target-value($prefix, iflex, display, inline-flex)
+  @include make-target-value($prefix, fnone, flex, none)
+  @include make-target-value($prefix, frow, flex-direction, row)
+  @include make-target-value($prefix, fcol, flex-direction, column)
+  @include make-target-value($prefix, fcol-reverse, flex-direction, column-reverse)
+  @include make-target-value($prefix, frow-reverse, flex-direction, row-reverse)
+  @include make-target-value($prefix, fwrap, flex-wrap, wrap)
+  @include make-target-value($prefix, fwrap-not, flex-wrap, nowrap)
+  @include make-target-value($prefix, fwrap-reverse, flex-wrap, wrap-reverse)
+
+  @include make-target-value($prefix, fai-start, align-items, start)
+  @include make-target-value($prefix, fai-end, align-items, end)
+  @include make-target-value($prefix, fai-center, align-items, center)
+  @include make-target-value($prefix, fai-baseline, align-items, baseline)
+  @include make-target-value($prefix, fai-stretch, align-items, stretch)
+
+  @include make-target-value($prefix, fas-start, align-self, start)
+  @include make-target-value($prefix, fas-end, align-selfs, end)
+  @include make-target-value($prefix, fas-center, align-self, center)
+  @include make-target-value($prefix, fas-baseline, align-self, baseline)
+  @include make-target-value($prefix, fas-stretch, align-self, stretch)
+
+  @include make-target-value($prefix, fac-start, align-content, flex-start)
+  @include make-target-value($prefix, fac-end, align-content, flex-end)
+  @include make-target-value($prefix, fac-center, align-content, center)
+  @include make-target-value($prefix, fac-around, align-content, space-around)
+  @include make-target-value($prefix, fac-between, align-content, space-between)
+  @include make-target-value($prefix, fas-stretch, align-content, stretch)
+
+  @include make-target-value($prefix, fjc-start, justify-content, flex-start)
+  @include make-target-value($prefix, fjc-end, justify-content, flex-end)
+  @include make-target-value($prefix, fjc-center, justify-content, center)
+  @include make-target-value($prefix, fjc-center, justify-content, center)
+  @include make-target-value($prefix, fjc-around, justify-content, space-around)
+  @include make-target-value($prefix, fjc-between, justify-content, space-between)
+
+  @include make-target-value($prefix, fgrow, flex-grow, 1)
+  @include make-target-value($prefix, fgrow-not, flex-grow, 0)
+
+  @include make-target-value($prefix, fshrink, flex-shrink, 1)
+  @include make-target-value($prefix, fshrink-not, flex-shrink, 0)
+
+  @include make-target-value($prefix, forder0, order, 0)
+  @include make-target-value($prefix, forder1, order, 1)
+  @include make-target-value($prefix, forder2, order, 2)
+  @include make-target-value($prefix, forder3, order, 3)
+  @include make-target-value($prefix, forder4, order, 4)
+  @include make-target-value($prefix, forder5, order, 5)
+  @include make-target-value($prefix, forder6, order, 6)
+  @include make-target-value($prefix, forder7, order, 7)
+  @include make-target-value($prefix, forder8, order, 8)
+  @include make-target-value($prefix, forder9, order, 9)
+  @include make-target-value($prefix, forder-last, order, 99999)
+
+
+  @include make-target-value($prefix, fshrink, flex-shrink, 1)
+  @include make-target-value($prefix, fshrink-not, flex-shrink, 0)
+
+  // visable
+  @include make-target-value($prefix, hide, display, none)
+  @include make-target-value($prefix, show, display, initial)
+  @include make-target-value($prefix, ovisable, overflow, visable)
+  @include make-target-value($prefix, oscroll, overflow, hidden)
+  @include make-target-value($prefix, ohide, overflow, scroll)
+  @include make-target-value($prefix, auto, overflow, auto)
+
+  // text
+  .#{$prefix}tf1
+    font-size: nth($font-size, 6)
+  .#{$prefix}tf2
+    font-size: nth($font-size, 5)
+  .#{$prefix}tf3
+    font-size: nth($font-size, 4)
+  .#{$prefix}tf4
+    font-size: nth($font-size, 3)
+  .#{$prefix}tf5
+    font-size: nth($font-size, 2)
+  .#{$prefix}tf6
+    font-size: nth($font-size, 1)
+
+  .#{$prefix}treset
+    white-space: initial
+    overflow: initial
+    text-overflow: initial
+    text-decoration: initial
+    text-align: initial
+  @include make-target-value($prefix, tal, text-align, left)
+  @include make-target-value($prefix, tar, text-align, right)
+  @include make-target-value($prefix, tac, text-align, center)
+  @include make-target-value($prefix, ti, font-style, italic)
+  @include make-target-value($prefix, tb, font-weight, bold)
+  @include make-target-value($prefix, tu, text-decoration, underline)
+  @include make-target-value($prefix, tu-not, text-decoration, underline)
+  @include make-target-value($prefix, tpre, white-space, pre)
+  @include make-target-value($prefix, twrap, white-space, wrap)
+  @include make-target-value($prefix, twrap-not, white-space, nowrap)
+  @include make-target-value($prefix, tnormal, white-space, normal)
+  .#{$prefix}t-ddd
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+  .#{$prefix}row
+    display: flex
+    flex: 0 1 auto
+    flex-direction: row
+    flex-wrap: wrap
+
+  .#{$prefix}col,
+  .#{$prefix}col1,
+  .#{$prefix}col2,
+  .#{$prefix}col3,
+  .#{$prefix}col4,
+  .#{$prefix}col5,
+  .#{$prefix}col6,
+  .#{$prefix}col-10,
+  .#{$prefix}col-20,
+  .#{$prefix}col-30,
+  .#{$prefix}col-33,
+  .#{$prefix}col-40,
+  .#{$prefix}col-50,
+  .#{$prefix}col-60,
+  .#{$prefix}col-66,
+  .#{$prefix}col-70,
+  .#{$prefix}col-80,
+  .#{$prefix}col-90,
+  .#{$prefix}col-100
+    flex: 0 0 auto
+
+
+  .#{$prefix}col1
+    flex-basis: 16.66666667%
+    max-width: 16.66666667%
+
+  .#{$prefix}col2,#{$prefix}col-33
+    flex-basis: 33.33333333%
+    max-width: 33.33333333%
+
+  .#{$prefix}col3
+    flex-basis: 50%
+    max-width: 50%
+
+  .#{$prefix}col4,#{$prefix}col-66
+    flex-basis: 66.66666667%
+    max-width: 66.66666667%
+
+  .#{$prefix}col5
+    flex-basis: 83.33333333%
+    max-width: 83.33333333%
+
+  .#{$prefix}col6,#{$prefix}col-100
+    flex-basis: 100%
+    max-width: 100%
+
+  // #{prefix}col-(10-100)
+  $i: 10
+  @while $i <= 100
+    $subname: unquote("#{$prefix}#{col}-" + $i)
+    $value: get-percent-value($i)
+    .#{$subname}
+      flex-basis: $value
+      max-width: $value
+    $i: $i + 10
+
+@include create-everything(e)
+
+@media screen and (max-width: $break-medium)
+  @include create-everything(s)
+
+@media screen and (min-width: $break-medium)
+  @include create-everything(x)
+
+@media screen and (min-width: $break-medium) and (max-width: $break-large)
+  @include create-everything(m)
+
+@media screen and (min-width: $break-large)
+  @include create-everything(l)
+
+.border-not 
+  border: none
+
+.outline-not
+  border: none
+
+.debug
+  outline: 1 solid black !important
+  background: yellow !important
+  div,header,footer,main,nav,table,tbody,ol,ul,section
+    outline: 1px solid blue !important
+  p,h1,h2,h3,h4,h5,h3,pre,label,legend,thead,tfoot,li
+    outline: 1px solid red !important
+  span,i,em,strong,code,cite,tr,caption
+    outline: 1px solid green !important
+  form,input,button,select,textarea,option,th,colgroup
+    outline: 1px solid orange !important
+  img,canvas,video,audio,iframe,map,td,col
+    background: #aaa
+    outline: 1px solid yellow !important
+
+// add a <div class="debug-break"></div> for a hud that
+// shows one of (S,M,L) at the lower right of the screen
+.debug-break
+  position: fixed
+  padding: 0.5em
+  bottom: 0
+  right: 0
+  font-size: 0.75em
+  background: #8bcbd3
+  color: black
+
+.debug-break::before
+  content: "S"
+
+@media screen and (min-width: $break-medium) and (max-width: $break-large)
+  .debug-break
+    background: #5abcc9
+  .debug-break::before
+    content: "M"
+
+@media screen and (min-width: $break-large)
+  .debug-break
+    background: #3fc1b4
+  .debug-break::before
+    content: "L"
+
+.debug-grid
+  background: white url( data:image/gif;base64,R0lGODdhEAAQAPEAAADw/wDx/xXy/////ywAAAAAEAAQAAACIZyPKckYDQFsb6ZqD85jZ2+BkwiRFKehhqQCQgDHcgwEBQA7 ) repeat top left
+
+
